@@ -1,0 +1,16 @@
+@import url(http://fonts.googleapis.com/css?family=Permanent+Marker);
+
+body {
+	background: url('http://photos1.blogger.com/blogger/1445/3162/1600/Hooks%20Ship.jpg') fixed;
+	text-align: center;
+	font-family: Helvetica, sans-serif;
+}
+input {
+	border: 2px solid #999;
+	font-family: Helvetica, sans-serif;
+	color: #999;
+}
+
+h1 {
+	font-family: 'Permanent Marker', 'cursive';
+}

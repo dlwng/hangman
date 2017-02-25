@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Assignment 4</title>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<link rel="stylesheet" type="text/css" href="stylesheet.css">
+</head>
+<body>
+	<h1>Welcome to Hangman!</h1>
+	<h2 id = "blanks"></h2>
+	<div id="hangman">
+		<img src="gallow.png">
+	</div>
+	<form>
+		<input id = "letter" type="text" size="5" maxlength="1">
+		<input type="button" value="Guess" onClick="guess()">
+
+		<h3>Letters Guessed: </h3><p id = "letters"></p>
+		<h3>Total Number Guessed: </h3><p id = "total"></p>
+		<h3>Incorrect Letters Guessed: </h3><p id = "incorrect"></p>
+		<input type="button" value="Start New Game" onClick="location.reload()">
+
+	</form>
+</body>
+<script>
+//initialize everything
+var word = "";
+var incorrect = 0;
+var total = 0;
+var guessed = "";
+var buildword = [];
+var wrongtry = 0;
+
+
+var w = localStorage.getItem('wins');
+if (w === null)
+	w = 0;
+console.log(w);
+
+var loss = localStorage.getItem('losses');
+if (loss === null)
+	loss = 0;
+console.log(loss);
+
+
+
+
+$(document).ready(function(){
+    $.post("process.php", "", function(data){
+        word = $(data).find("value").text();
+        word = word.trim();
+        console.log(word);
+        console.log(word.length);
+        for (var i = 0; i < word.length; i++) {
+            $("h2").append("_ ");
+        }
+		$("#blanks").show();
+		$("#hangman").show();
+    });
+});
+
+var image = 0;
+var mypics = new Array();
+mypics[0]="head.png";
+mypics[1]="body.png";
+mypics[2]="onearm.png";
+mypics[3]="nolegs.png";
+mypics[4]="oneleg.png";
+mypics[5]="fullbody.png";
+mypics[6]="pirate.png";
+
+function guess() {
+	var letter = $("#letter").val();
+	if (guessed.includes(letter)) {
+		alert("you cannot guess the same letter twice!");
+		return;
+	}
+	var found = [];
+	if (buildword.length == 0) {
+		buildword.length = word.length;
+		buildword.fill("_")
+	}
+	for(var i = 0; i < word.length; i++) {
+        if (word.charAt(i) == letter)
+            found.push(i);
+    }
+    total++;
+    document.getElementById("total").innerHTML = total;
+    guessed = letter + " ";
+    $("#letters").append(guessed); 
+    
+    if (found.length == 0) { //letter not in word
+    	wrongtry++;
+    	$("#hangman img").attr("src", mypics[image++]);
+    	alert("letter is not in the word!");
+    	incorrect++;
+    	document.getElementById("incorrect").innerHTML = incorrect;
+    	if (wrongtry == 7) {
+    		loss++;
+		
+    		localStorage.setItem("losses", loss);
+    		alert("sorry! you lost! you won " + localStorage.getItem("wins") + " games and lost " + localStorage.getItem("losses") + " games.");
+    	}
+    }
+    else { //letter in word
+    	alert("letter is in the word!");
+    	for (var j = 0; j < found.length; j++) {
+    		for (var k = 0; k < word.length; k++) {
+    			if (found[j] == k) {
+    				buildword[k] = letter;
+    			}
+    			if (buildword[k] == " ") {
+    				buildword[k] = " ";
+    			}
+    			else if (buildword[k] == "_") {
+    				buildword[k] = "_";
+    			}
+    		}
+    	}
+    	var str = "";
+    	for (var l = 0; l < word.length; l++) {
+    		str += buildword[l] + " ";
+    	}
+    	document.getElementById("blanks").innerHTML = str;
+ 		
+    }
+    var count = 0;
+    for (var i = 0; i < buildword.length; i++) {
+    	if (buildword[i] == "_") {
+    		console.log(buildword[i]);
+    		count++;
+    	}
+    }
+    console.log(count);
+    if (count == 0) {
+    	w++;
+		localStorage.setItem("wins", w);
+    	alert("you won! you won " + localStorage.getItem("wins") + " games and lost " + localStorage.getItem("losses") + " games.");
+    }
+}
+
+function filled(spot) {
+	return spot = "_";
+}
+
+</script>
+</html>
